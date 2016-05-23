@@ -56,7 +56,7 @@ class EloquentOAuthServiceProvider extends ServiceProvider {
             return new EloquentIdentityStore;
         });
     }
-    
+
     protected function registerOAuthManager()
     {
         $this->app['adamwathan.oauth'] = $this->app->share(function ($app) {
@@ -65,10 +65,10 @@ class EloquentOAuthServiceProvider extends ServiceProvider {
             $request = $this->getRequest($app);
             $stateGenerator = new StateGenerator;
             $socialnorm = new SocialNorm($providerRegistry, $session, $request, $stateGenerator);
-            
+
             //register built-in providers
             $this->registerProviders($socialnorm, $request);
-            
+
             //register custom providers
             $this->registerCustomProviders($socialnorm, $request);
 
@@ -92,7 +92,7 @@ class EloquentOAuthServiceProvider extends ServiceProvider {
             return $oauth;
         });
     }
-    
+
     protected function registerProviders($socialnorm, $request)
     {
         if (! $providerAliases = $this->app['config']['eloquent-oauth.providers']) {
@@ -118,41 +118,41 @@ class EloquentOAuthServiceProvider extends ServiceProvider {
      * @author Tyson LT
      */
     protected function registerCustomProviders($socialnorm, $request) {
-    	 
+
     	//loop over list of custom providers, if any
     	foreach ($this->getCustomProviderConfig() as $alias => $config) {
 
    	    //get the custom provider class name
    	    $providerClass = $this->getCustomProviderClass($config);
-    			
+
    	    //did the developer provide a custom class?
    	    if (null == $providerClass) {
-    				 
+
                 //no provider class found, tell dev how to configure
                 throw new ProviderNotRegisteredException("Custom provide '$alias' does not have a 'provider_class' element in config/eloquent-auth.php");
-    				 
+
    	    } else if (!class_exists($providerClass)) {
-   			
+
                 //class does not exist, so give developer a handy hint
                 throw new ProviderNotRegisteredException("Could not construct '$providerClass' [class_exists() failed] for custom provider '$alias'.");
-   				
+
    	    }
-    				
+
             //create our custom provider
             $provider = new $providerClass($config, $this->getHttpClient(), $request);
-    
+
             //register provider with OAuth container
             $socialnorm->registerProvider($alias, $provider);
-    				
+
             Log::debug("Registered custom OAuth provider '$alias' as '$providerClass'");
-    			 
+
         } //end foreach: custom providers
 
     }
-        
+
     /**
      * Load custom providers array from config, if present.
-     * 
+     *
      * @author Tyson LT
      * @return Provider config array if defined, or empty array.
      */
@@ -163,10 +163,10 @@ class EloquentOAuthServiceProvider extends ServiceProvider {
     		return [];
     	}
     }
-    
+
     /**
      * Get the custom provider class, if any.
-     * 
+     *
      * @param array $config
      * @author TysonLT
      */
@@ -177,7 +177,7 @@ class EloquentOAuthServiceProvider extends ServiceProvider {
     		return $config['provider_class'];
     	}
     }
-    
+
     /**
      * Get the Laravel request.
      * @author Tyson LT
@@ -185,7 +185,7 @@ class EloquentOAuthServiceProvider extends ServiceProvider {
     protected function getRequest($app) {
     	return new Request($app['request']->all());
     }
-    
+
     /**
      * Get the Laravel session.
      * @author Tyson LT
@@ -193,7 +193,7 @@ class EloquentOAuthServiceProvider extends ServiceProvider {
     protected function getSession($app) {
     	return new Session($app['session']);
     }
-    
+
     /**
      * Create HttpClient
      * @author Tyson LT
@@ -201,7 +201,7 @@ class EloquentOAuthServiceProvider extends ServiceProvider {
     protected function getHttpClient() {
     	return new HttpClient();
     }
-    
+
     protected function configureOAuthIdentitiesTable()
     {
         OAuthIdentity::configureTable($this->app['config']['eloquent-oauth.table']);
